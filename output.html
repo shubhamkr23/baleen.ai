@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Code Editor - JS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/monokai.min.css">
+    <style>
+        body {
+            background: #1e1e1e;
+            color: #c5c5c5;
+        }
+        .hello {
+            height: 650px;
+        }
+        .code-editor-card {
+            background: #2d2d2d;
+            border: none;
+        }
+        .CodeMirror {
+            height: 650px;
+            background: #1e1e1e;
+        }
+        .navbar {
+            background: #333;
+        }
+        .nav-link {
+            color: #c5c5c5 !important;
+        }
+        .tab-content {
+            background: #2d2d2d;
+            border: 1px solid #444;
+            padding: 15px;
+        }
+        .editor-container {
+            display: flex;
+            flex-wrap: wrap;
+            height: 650px;
+        }
+        .editors {
+            flex: 1;
+            min-width: 300px;
+            padding: 10px;
+        }
+        .preview {
+            flex: 1;
+            min-width: 300px;
+            padding: 10px;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #444;
+        }
+        pre {
+            background: #333;
+            padding: 10px;
+            border: 1px solid #444;
+            overflow-x: auto;
+            color: #c5c5c5;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Code Editor</a>
+        </div>
+    </nav>
+    <div class="hello">
+        <div class="editor-container">
+            <div class="editors">
+                <ul class="nav nav-tabs" id="editorTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="html-tab" data-bs-toggle="tab" data-bs-target="#html" type="button" role="tab" aria-controls="html" aria-selected="true">HTML</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="css-tab" data-bs-toggle="tab" data-bs-target="#css" type="button" role="tab" aria-controls="css" aria-selected="false">CSS</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="js-tab" data-bs-toggle="tab" data-bs-target="#js" type="button" role="tab" aria-controls="js" aria-selected="false">JS</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="editorTabContent">
+                    <div class="tab-pane fade show active" id="html" role="tabpanel" aria-labelledby="html-tab">
+                        <textarea id="html-editor"></textarea>
+                    </div>
+                    <div class="tab-pane fade" id="css" role="tabpanel" aria-labelledby="css-tab">
+                        <textarea id="css-editor"></textarea>
+                    </div>
+                    <div class="tab-pane fade" id="js" role="tabpanel" aria-labelledby="js-tab">
+                        <textarea id="js-editor"></textarea>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button class="btn btn-primary w-100" id="execute_code">Run</button>
+                    </div>
+                </div>
+            </div>
+            <div class="preview">
+                <iframe id="preview-panel"></iframe>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var htmlEditor = CodeMirror.fromTextArea(document.getElementById("html-editor"), {
+                mode: "xml",
+                theme: "monokai",
+                lineNumbers: true
+            });
+
+            var cssEditor = CodeMirror.fromTextArea(document.getElementById("css-editor"), {
+                mode: "css",
+                theme: "monokai",
+                lineNumbers: true
+            });
+
+            var jsEditor = CodeMirror.fromTextArea(document.getElementById("js-editor"), {
+                mode: "javascript",
+                theme: "monokai",
+                lineNumbers: true
+            });
+
+            document.getElementById("execute_code").addEventListener("click", function() {
+                const htmlContent = htmlEditor.getValue();
+                const cssContent = cssEditor.getValue();
+                const jsContent = jsEditor.getValue();
+
+                // Create the output content
+                const outputContent = `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <style>${cssContent}</style>
+                    </head>
+                    <body>
+                        ${htmlContent}
+                        <script>${jsContent}<\/script>
+                    </body>
+                    </html>
+                `;
+
+                // Render the output content in the iframe
+                const iframe = document.getElementById("preview-panel");
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                iframeDocument.open();
+                iframeDocument.write(outputContent);
+                iframeDocument.close();
+            });
+
+            function getQueryParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            function escapeHtml(html) {
+                const div = document.createElement('div');
+                div.appendChild(document.createTextNode(html));
+                return div.innerHTML;
+            }
+
+            const htmlContent = getQueryParam('html') || '<p>No HTML found</p>';
+            const cssContent = getQueryParam('css') || '/* No CSS found */';
+            const jsContent = getQueryParam('js') || '// No JavaScript found';
+
+            htmlEditor.setValue(htmlContent);
+            cssEditor.setValue(cssContent);
+            jsEditor.setValue(jsContent);
+
+            const combinedContent = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>${cssContent}</style>
+                </head>
+                <body>
+                    ${htmlContent}
+                    <script>${jsContent}<\/script>
+                </body>
+                </html>
+            `;
+
+            document.getElementById('preview-panel').srcdoc = combinedContent;
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+</body>
+</html>
